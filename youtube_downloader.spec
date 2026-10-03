@@ -1,11 +1,18 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import os
 
+ffmpeg_bin = os.path.join(SPECPATH, "build", "ffmpeg", "bin")
+ffmpeg_datas = [
+    (os.path.join(ffmpeg_bin, filename), "ffmpeg")
+    for filename in os.listdir(ffmpeg_bin)
+    if os.path.isfile(os.path.join(ffmpeg_bin, filename))
+]
 a = Analysis(
-    ['youtube_downloader.py'],
+    ["youtube_downloader.py"],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=ffmpeg_datas,
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -14,6 +21,7 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
+
 pyz = PYZ(a.pure)
 
 exe = EXE(

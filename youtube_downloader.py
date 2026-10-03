@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import threading
 from pathlib import Path
+import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import logging
@@ -91,6 +92,17 @@ def strip_ansi_codes(text: str) -> str:
     """Remove ANSI escape codes from text."""
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
     return ansi_escape.sub('', text)
+
+
+def bundled_ffmpeg_location() -> str | None:
+    """Return the bundled FFmpeg directory when running as a packaged app."""
+    if not getattr(sys, "frozen", False):
+        return None
+
+    ffmpeg_dir = Path(getattr(sys, "_MEIPASS")) / "ffmpeg"
+    if not (ffmpeg_dir / "ffmpeg.exe").is_file() or not (ffmpeg_dir / "ffprobe.exe").is_file():
+        raise FileNotFoundError("The bundled FFmpeg files are missing.")
+    return str(ffmpeg_dir)
 
 
 class UILogger:
@@ -368,6 +380,9 @@ class YouTubeDownloader(tk.Tk):
             }
 
         try:
+            ffmpeg_dir = bundled_ffmpeg_location()
+            if ffmpeg_dir is not None:
+                ydl_opts["ffmpeg_location"] = ffmpeg_dir
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
         except Exception as exc:
