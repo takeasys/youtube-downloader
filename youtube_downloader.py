@@ -366,7 +366,7 @@ class YouTubeDownloader(tk.Tk):
                 "noplaylist": True,
                 "ignoreerrors": False,
                 "retries": 3,
-                "format": "best",
+                "format": "bestvideo*+bestaudio/best",
                 "merge_output_format": "mp4",
                 "logger": ui_logger,
                 "logtostderr": False,
